@@ -1,0 +1,25 @@
+#/bin/bash
+
+iptables -t nat -F
+iptables -t nat -Z
+iptables -t filter -F
+iptables -t filter -Z
+iptables -t nat -A POSTROUTING -s 10.7.22.0/24 -o eth2 -j SNAT --to-source 90.0.0.1
+iptables -t nat -A POSTROUTING -s 10.8.22.0/24 -o eth2 -j SNAT --to-source 90.0.0.1
+
+#Establecemos las politicas por defecto
+iptables -P INPUT DROP
+iptables -P OUTPUT ACCEPT
+
+#Permitir acceso al firewall desde las subredes privadas
+iptables -A INPUT -s 10.7.22.0/24 -i eth0 -j ACCEPT
+iptables -A INPUT -s 10.8.22.0/24 -i eth0 -j ACCEPT
+
+#Permitir acceso desde internet a la DMZ
+iptables -A FORDWARD -d 80.0.0.40 -p udp --dport 7 -j ACCEPT
+iptables -A FORDWARD -d 80.0.0.50 -p udp --dport 13 -j ACCEPT
+
+#Comunicacion DMZ con subredes privadas
+iptables -A FORDWARD -s 10.7.22.0/24 -d 80.0.0.50 -p tcp --dport 7 -j ACCEPT
+iptables -A FORDWARD -s 10.8.22.0/24 -d 80.0.0.50 -p tcp --dport 23 -j ACCEPT
+
