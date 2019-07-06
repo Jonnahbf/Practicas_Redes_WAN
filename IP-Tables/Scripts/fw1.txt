@@ -1,0 +1,10 @@
+#!/bin/bash
+
+iptables -t nat -F
+iptables -t nat -Z
+
+#Aplicarle SNAT a la red 10.7.22.0/24, se cambiará la ip origen a 90.0.0.1
+iptables -t nat -A POSTROUTING -s 10.7.22.0/24 -o eth2 -j SNAT --to-source 90.0.0.1
+
+#Aplicarle SNAT a la red 10.8.22.0/24, se cambiará la ip origen a 90.0.0.1
+iptables -t nat -A POSTROUTING -s 10.8.22.0/24 -o eth2 -j SNAT --to-source 90.0.0.1
